@@ -1,12 +1,18 @@
-import os
-
-import flask
+from datetime import datetime
 from flask import Flask, request
 from flask_cors import CORS
 
+from credentials.config import S3_BUCKET_NAME, S3_KEY, S3_SECRET
+from database import S3FileManager
+
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploaded_files'
+app.config.from_pyfile('config.py')
 CORS(app)
+s3_manager = S3FileManager(S3_BUCKET_NAME, S3_KEY, S3_SECRET)
+
+
+def make_unique_filename(extension='txt'):
+    return f'file{datetime.utcnow()}.{extension}'
 
 
 @app.route('/')
