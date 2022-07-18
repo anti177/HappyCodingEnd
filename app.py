@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Flask, request
 from flask_cors import CORS
 
-from credentials.config import S3_BUCKET_NAME, S3_KEY, S3_SECRET
+from credentials.s3_config import S3_BUCKET_NAME, S3_KEY, S3_SECRET
 from database import S3FileManager
 
 app = Flask(__name__)
@@ -11,8 +11,9 @@ CORS(app)
 s3_manager = S3FileManager(S3_BUCKET_NAME, S3_KEY, S3_SECRET)
 
 
-def make_unique_filename(extension='txt'):
-    return f'file{datetime.utcnow()}.{extension}'
+def make_unique_filename(extension=None):
+    tail = '.' + extension if extension else ''
+    return f'file{datetime.utcnow()}{tail}'
 
 
 @app.route('/')
@@ -25,23 +26,23 @@ def video():
     fileObj = request.files.get("file")
     print(fileObj)
 
-    #处理文件
-    # TODO：
+    remote_filename = make_unique_filename()
+    s3_manager.upload(fileObj, remote_filename)
 
-    #返回处理好的到前端
-    # TODO：
+    # todo: Real processing logic and return result to the frontend.
+
     return {"code": 200, "message": "上传请求成功"}
+
 
 @app.route('/photo', methods=["POST"])
 def photo():
-    fileObj = request.files.get("file")
-    print(fileObj)
+    files = request.files.get("file", type=list)
 
-    #处理文件
-    #TODO：
+    for f in files:
+        s3_manager.upload(f, make_unique_filename())
 
-    #返回处理好的文件到前端
-    #TODO：
+    # todo: Real processing logic and return result to the frontend.
+
     return {"code": 200, "message": "上传请求成功"}
 
 
