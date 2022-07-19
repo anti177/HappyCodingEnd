@@ -6,7 +6,7 @@ from credentials.s3_config import S3_BUCKET_NAME, S3_KEY, S3_SECRET
 from database import S3FileManager
 
 app = Flask(__name__)
-app.config.from_pyfile('config.py')
+app.config.from_pyfile('credentials/s3_config.py')
 CORS(app)
 s3_manager = S3FileManager(S3_BUCKET_NAME, S3_KEY, S3_SECRET)
 
@@ -36,10 +36,9 @@ def video():
 
 @app.route('/photo', methods=["POST"])
 def photo():
-    files = request.files.get("file", type=list)
-
-    for f in files:
-        s3_manager.upload(f, make_unique_filename())
+    files = request.files.get("file")
+    print(files)
+    s3_manager.upload(files, make_unique_filename())
 
     # todo: Real processing logic and return result to the frontend.
 
