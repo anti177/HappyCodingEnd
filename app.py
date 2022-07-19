@@ -38,7 +38,7 @@ def video():
 def photo():
     files = request.files.get("file")
     print(files)
-    s3_manager.upload(files, make_unique_filename())
+    s3_manager.upload(files, make_unique_filename("jpeg"))
 
     # todo: Real processing logic and return result to the frontend.
 
