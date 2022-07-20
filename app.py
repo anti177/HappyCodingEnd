@@ -44,7 +44,7 @@ def photo():
     face_details = FaceAnalyzer(kSession).analyze_face_details(photo_file)["FaceDetails"]
     emotified_img = tag_emoticon(image.open(photo_file), face_details, summary)
     print(face_details)
-    emotified_img.show()
+    # emotified_img.show()
 
     return {
         "code": 200,
