@@ -50,12 +50,13 @@ def tag_emoticon(img: Image, face_details, summary) -> Image:
         emoji_img = PIL.Image.open(f"static/emoji/{emotion}/{emoji_name}.png").resize((width, height))
         img.paste(emoji_img, (left, top, left + width, top + height))
 
-        xx = {'age': age,
-              'male': male,
-              'emotion': emotion,
-              'bearded': bearded,
-              'img': "data:image/png;base64,"+pil_base64(emoji_img)
-              }
+        xx = {
+            "age": age,
+            "male": male,
+            "emotion": emotion,
+            "bearded": bearded,
+            "img": "data:image/png;base64," + pil_base64(emoji_img)}
+
         summary.append(xx)
 
     return img
