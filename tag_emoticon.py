@@ -60,7 +60,8 @@ def tag_emoticon(img, face_details, summary):
             "male": male,
             "emotion": emotion,
             "bearded": bearded,
-            "img": "data:image/png;base64," + pil_base64(emoji_img)}
+            "img": "data:image/png;base64," + pil_base64(emoji_img)
+        }
 
         summary.append(xx)
 

@@ -1,5 +1,6 @@
 import json
 import tempfile
+from os.path import exists
 
 import imageio.v3 as iio
 from werkzeug.datastructures import FileStorage
@@ -90,11 +91,13 @@ from moviepy.editor import VideoFileClip, AudioFileClip
 
 def extract_audio(video_path, audio_path):
     my_clip = mp.VideoFileClip(video_path)
-    my_clip.audio.write_audiofile(audio_path)
+    if my_clip.audio:
+        my_clip.audio.write_audiofile(audio_path)
 
 
 # 视频添加音频
 def video_add_audio(video_path, audio_path, out_video_path, fps):
     video = VideoFileClip(video_path)
-    videos = video.set_audio(AudioFileClip(audio_path))  # 音频文件
-    videos.write_videofile(out_video_path, audio_codec='aac', fps=fps)  # 保存合成视频，注意加上参数audio_codec='aac'，否则音频无声音
+    if exists(audio_path):
+        videos = video.set_audio(AudioFileClip(audio_path))  # 音频文件
+        videos.write_videofile(out_video_path, audio_codec='aac', fps=fps)  # 保存合成视频，注意加上参数audio_codec='aac'，否则音频无声音

@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import imageio.v3
 import numpy
 from PIL import Image
@@ -11,6 +13,11 @@ from video import detect_faces, extract_audio, video_add_audio
 
 app = Flask(__name__)
 CORS(app)
+
+
+@app.route("/")
+def hello():
+    return "Hi. The Happy-coding team is healthy!"
 
 
 @app.route("/video", methods=["POST"])
@@ -33,15 +40,21 @@ def handle_video():
     meta = detection_result["VideoMetadata"]
     framerate = float(meta["FrameRate"])
 
-    frames = []
     p = 0
+    age_sum = 0
+    emotions = defaultdict(int)
+    frames = []
     faces_in_frame = []
-    for i, frame in enumerate(imageio.v3.imiter("original_1658641778681637.mp4", plugin="FFMPEG")):
+    for i, frame in enumerate(imageio.v3.imiter(video_name, plugin="FFMPEG")):
         timestamp = i * 1000 / framerate
         tmp = [x["Face"] for x in faces if timestamp <= float(x["Timestamp"]) < (timestamp + 1000 / framerate)]
         if len(tmp) != 0: faces_in_frame = tmp
-        tagged_img = tag_emoticon(Image.fromarray(frame), faces_in_frame, [])
+        summary = []
+        tagged_img = tag_emoticon(Image.fromarray(frame), faces_in_frame, summary)
         frames.append(numpy.asarray(tagged_img))
+        for x in summary:
+            age_sum += int(x["age"])
+            emotions[x["emotion"]] += 1
 
     quiet_video_name = f"quiet_{tail}.mp4"
     final_video_name = f"processed_{tail}.mp4"
@@ -53,8 +66,17 @@ def handle_video():
     return {
         "code": 200,
         "message": "上传视频请求成功",
-        "summary": "todo",
         "url": f"https://{secrets.kBucketName}.s3.amazonaws.com/{final_video_name}",
+        "summary": {
+            "age": round(age_sum / len(frames), 0.01),
+            "happy": round(emotions["happy"] / len(frames) * 100, 0.01),
+            "sad": round(emotions["sad"] / len(frames) * 100, 0.01),
+            "calm": round(emotions["calm"] / len(frames) * 100, 0.01),
+            "surprised": round(emotions["surprised"] / len(frames) * 100, 0.01),
+            "disgusted": round(emotions["disgusted"] / len(frames) * 100, 0.01),
+            "confused": round(emotions["confused"] / len(frames) * 100, 0.01),
+            "angry": round(emotions["angry"] / len(frames) * 100, 0.01)
+        },
     }
 
 
