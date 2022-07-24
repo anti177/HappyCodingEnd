@@ -61,7 +61,7 @@ def handle_video():
 @app.route("/photo", methods=["POST"])
 def handle_photo():
     photo_file = request.files.get("file")
-    face_details = g_rek_client.detect_faces(Images={"Bytes": photo_file.read()}, Attributes=["ALL"])["FaceDetails"]
+    face_details = g_rek_client.detect_faces(Image={"Bytes": photo_file.read()}, Attributes=["ALL"])["FaceDetails"]
 
     summary = []
     photo_file.seek(0)
