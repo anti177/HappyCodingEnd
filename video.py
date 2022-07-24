@@ -82,3 +82,19 @@ def make_video_file(frames, fps=18) -> FileStorage:
     iio.imwrite(buffer.name, frames, plugin="FFMPEG", fps=fps)
     buffer.seek(0)
     return buffer
+
+
+import moviepy.editor as mp
+from moviepy.editor import VideoFileClip, AudioFileClip
+
+
+def extract_audio(video_path, audio_path):
+    my_clip = mp.VideoFileClip(video_path)
+    my_clip.audio.write_audiofile(audio_path)
+
+
+# 视频添加音频
+def video_add_audio(video_path, audio_path, out_video_path, fps):
+    video = VideoFileClip(video_path)
+    videos = video.set_audio(AudioFileClip(audio_path))  # 音频文件
+    videos.write_videofile(out_video_path, audio_codec='aac', fps=fps)  # 保存合成视频，注意加上参数audio_codec='aac'，否则音频无声音

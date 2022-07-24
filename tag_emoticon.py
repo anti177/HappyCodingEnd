@@ -1,8 +1,13 @@
 import base64
+import json
 from io import BytesIO
 
 import PIL
-from PIL.Image import Image
+import imageio
+import numpy
+from PIL import Image
+
+from video import extract_audio, video_add_audio
 
 
 def pil_base64(image):
@@ -13,7 +18,7 @@ def pil_base64(image):
     return base64_str
 
 
-def tag_emoticon(img: Image, face_details, summary) -> Image:
+def tag_emoticon(img, face_details, summary):
     """Tag emoticons onto each face in the image. The list follows the schema defined by
     [Rekognition](https://docs.aws.amazon.com/rekognition/latest/APIReference/API_DetectFaces.html)."""
 
@@ -60,3 +65,26 @@ def tag_emoticon(img: Image, face_details, summary) -> Image:
         summary.append(xx)
 
     return img
+
+
+if __name__ == '__main__':
+    video_name = "original_1658641778681637.mp4"
+    audio_name = "original_1658641778681637.mp3"
+    extract_audio(video_name, audio_name)
+    with open("venv/tmp/rek_face_demo.json", "r") as demo_data:
+        detection_result = json.load(demo_data)
+    faces = detection_result["Faces"]
+    meta = detection_result["VideoMetadata"]
+    framerate = float(meta["FrameRate"])
+    frames = []
+    p = 0
+    faces_in_frame = []
+    for i, frame in enumerate(imageio.v3.imiter(video_name, plugin="FFMPEG")):
+        timestamp = i * 1000 / framerate
+        tmp = [x["Face"] for x in faces if timestamp <= float(x["Timestamp"]) < (timestamp + 1000 / framerate)]
+        if len(tmp) != 0: faces_in_frame = tmp
+        tagged_img = tag_emoticon(Image.fromarray(frame), faces_in_frame, [])
+        frames.append(numpy.asarray(tagged_img))
+    new_video_name = f"processed_test.mp4"
+    imageio.v3.imwrite(new_video_name, frames, plugin="FFMPEG", fps=framerate)
+    video_add_audio(new_video_name, audio_name, "with_audio.mp4", framerate)
