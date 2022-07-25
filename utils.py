@@ -16,7 +16,8 @@ class RegionalSession:
         return self._ssn.client(service_name, region_name=self._region)
 
 
-def timestamp_str(now=datetime.utcnow()):
+def timestamp_str(now=None):
+    if now is None: now = datetime.utcnow()
     # noinspection PyTypeChecker
     return str(int(now.timestamp() * 1e6))
 
