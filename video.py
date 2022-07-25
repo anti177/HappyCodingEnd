@@ -100,4 +100,6 @@ def video_add_audio(video_path, audio_path, out_video_path, fps):
     video = VideoFileClip(video_path)
     if exists(audio_path):
         videos = video.set_audio(AudioFileClip(audio_path))  # 音频文件
+    else:
+        videos = video
     videos.write_videofile(out_video_path, audio_codec='aac', fps=fps)  # 保存合成视频，注意加上参数audio_codec='aac'，否则音频无声音
