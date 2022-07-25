@@ -40,7 +40,6 @@ def handle_video():
     meta = detection_result["VideoMetadata"]
     framerate = float(meta["FrameRate"])
 
-    p = 0
     age_sum = 0
     emotions = defaultdict(int)
     frames = []
@@ -53,7 +52,7 @@ def handle_video():
         tagged_img = tag_emoticon(Image.fromarray(frame), faces_in_frame, summary)
         frames.append(numpy.asarray(tagged_img))
         for x in summary:
-            age_sum += int(x["age"])
+            age_sum += int(x["age"][:x["age"].find('-')])
             emotions[x["emotion"]] += 1
 
     quiet_video_name = f"quiet_{tail}.mp4"

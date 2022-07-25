@@ -24,6 +24,7 @@ def tag_emoticon(img, face_details, summary):
 
     for face_attributes in face_details:
         age = int(face_attributes["AgeRange"]["High"])
+        age2 = int(face_attributes["AgeRange"]["Low"])
         male = (face_attributes["Gender"]["Value"] == "Male")
         emotion = face_attributes["Emotions"][0]["Type"].lower()
         bearded = face_attributes["Beard"]["Value"]
@@ -56,12 +57,16 @@ def tag_emoticon(img, face_details, summary):
         img.paste(emoji_img, (left, top, left + width, top + height))
 
         xx = {
-            "age": age,
+            "age": f"{age2}-{age}",
             "male": male,
             "emotion": emotion,
             "bearded": bearded,
             "img": "data:image/png;base64," + pil_base64(emoji_img)
         }
+
+        for e in face_attributes["Emotions"]:
+            et = e["Type"].lower()
+            xx[et] = round(float(e["Confidence"]), 2)
 
         summary.append(xx)
 
