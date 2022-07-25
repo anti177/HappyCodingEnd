@@ -67,7 +67,7 @@ def handle_video():
         "code": 200,
         "message": "上传视频请求成功",
         "url": f"https://{secrets.kBucketName}.s3.amazonaws.com/{final_video_name}",
-        "summary": {
+        "summary": [{
             "age": round(age_sum / len(frames), 0.01),
             "happy": round(emotions["happy"] / len(frames) * 100, 0.01),
             "sad": round(emotions["sad"] / len(frames) * 100, 0.01),
@@ -76,7 +76,7 @@ def handle_video():
             "disgusted": round(emotions["disgusted"] / len(frames) * 100, 0.01),
             "confused": round(emotions["confused"] / len(frames) * 100, 0.01),
             "angry": round(emotions["angry"] / len(frames) * 100, 0.01)
-        },
+        }],
     }
 
 
